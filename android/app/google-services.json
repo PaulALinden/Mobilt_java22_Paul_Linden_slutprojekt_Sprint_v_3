@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "77934051442",
+    "project_id": "sprintv3-39b07",
+    "storage_bucket": "sprintv3-39b07.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:77934051442:android:11c9ee2e34d82735e582eb",
+        "android_client_info": {
+          "package_name": "com.grit.sprint_v3"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDViq2tKfRAA8NvuUk9lfEOogDQGoT-OQ8"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
