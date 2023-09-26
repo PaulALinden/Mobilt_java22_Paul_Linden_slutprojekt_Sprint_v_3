@@ -11,7 +11,7 @@ void main() async {
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
-  runApp(MyApp());
+  runApp(const MyApp());
 }
 
 
@@ -61,41 +61,46 @@ class _MyHomePageState extends State<MyHomePage> {
     super.dispose();
   }
 
-  void _login() async{
+  void _login() {
     String username = usernameController.text.toLowerCase();
     String password = passwordController.text.toLowerCase();
 
-    UserModel userModel = UserModel(username,password);
+    UserModel userModel = UserModel();
+    userModel.username = username;
+    userModel.password = password;
 
     LoginController loginController = LoginController();
-    bool isUser = await loginController.login(userModel);
 
-    if(isUser){
-      Navigator.push(
-        context,
-        MaterialPageRoute(builder: (context) => const ProfilePage()), // Changed to ProfilePage
-      );
-    }
-    else{
-      showDialog(
-        context: context,
-        builder: (BuildContext context) {
-          return AlertDialog(
-            title: const Text('Login Failed'),
-            content: const Text('Invalid username or password. Please try again.'),
-            actions: [
-              TextButton(
-                onPressed: () {
-                  Navigator.of(context).pop();
-                },
-                child: const Text('OK'),
-              ),
-            ],
-          );
-        },
-      );
-    }
+    loginController.login(userModel).then((bool isUser) {
+      if (isUser) {
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (context) => ProfilePage(userModel: userModel)),
+        );
+      } else {
+        showDialog(
+          context: context,
+          builder: (BuildContext context) {
+            return AlertDialog(
+              title: const Text('Login Failed'),
+              content: const Text('Invalid username or password. Please try again.'),
+              actions: [
+                TextButton(
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                  },
+                  child: const Text('OK'),
+                ),
+              ],
+            );
+          },
+        );
+      }
+    }).catchError((error) {
+      print('Error: $error'); // Handle the error here
+    });
   }
+
 
   @override
   Widget build(BuildContext context) {

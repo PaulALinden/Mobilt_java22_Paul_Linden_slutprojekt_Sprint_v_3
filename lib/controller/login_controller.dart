@@ -4,8 +4,8 @@ import '../data/firestor_singelton.dart';
 
 class LoginController {
   Future<bool> login(UserModel user) async {
-    String username = user.getUserName();
-    String password = user.getPassword();
+    String username = user.username;
+    String password = user.password;
 
     FirestoreService firestoreService = FirestoreService();
     FirebaseFirestore firestore = firestoreService.firestore;
@@ -20,8 +20,10 @@ class LoginController {
         Map<String, dynamic> data = doc.data() as Map<String, dynamic>;
         String dbname = data['name'];
         String dbpassword = data['password'];
+        String dbUserId = doc.id;
 
         if(dbname == username && dbpassword == password){
+          user.userId = dbUserId;
           return true;
         }
       }
