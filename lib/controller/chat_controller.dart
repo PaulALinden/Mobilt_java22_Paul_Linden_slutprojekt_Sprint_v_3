@@ -1,12 +1,13 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:sprint_v3/controller/user_controller.dart';
 import 'package:sprint_v3/model/messages_model.dart';
-import '../data/firestor_singelton.dart';
 
-class ChatController{
-  FirestoreService firestoreService = FirestoreService();
+class ChatController {
+  final FirebaseFirestore firestore = FirebaseFirestore.instance;
+  final UserController userController = UserController();
 
   Stream<List<MessagesModel>> getMessagesForChatStream(String chatId) {
-    return FirebaseFirestore.instance
+    return firestore
         .collection('chats')
         .doc(chatId)
         .collection('messages')
@@ -14,7 +15,7 @@ class ChatController{
         .snapshots()
         .map((QuerySnapshot query) {
       List<MessagesModel> messages = [];
-      query.docs.forEach((doc) {
+      for (var doc in query.docs) {
         Map<String, dynamic> data = doc.data() as Map<String, dynamic>;
         messages.add(MessagesModel(
           messageId: doc.id,
@@ -23,33 +24,12 @@ class ChatController{
           content: data['content'],
           timestamp: data['timestamp'].toDate(),
         ));
-      });
+      }
       return messages;
     });
   }
 
-
-  Future<String> getUserName(String userId) async {
-    FirebaseFirestore firestore = firestoreService.firestore;
-
-    try {
-      DocumentSnapshot userDoc =
-      await firestore.collection('users').doc(userId).get();
-      if (userDoc.exists) {
-        Map<String, dynamic> userData = userDoc.data() as Map<String, dynamic>;
-        return userData['name'];
-      } else {
-        return 'Unknown User';
-      }
-    } catch (e) {
-      print("Error getting user name: $e");
-      return 'Unknown User';
-    }
-  }
-
   Future<List<Map<String, String>>> getChatsForUser(String userId) async {
-    FirebaseFirestore firestore = firestoreService.firestore;
-
     try {
       QuerySnapshot chatSnapshot = await firestore
           .collection('chats')
@@ -60,8 +40,10 @@ class ChatController{
 
       for (QueryDocumentSnapshot chatDoc in chatSnapshot.docs) {
         List<String> members = List<String>.from(chatDoc['members']);
-        String chatPartnerId = members.firstWhere((memberId) => memberId != userId);
-        String chatPartnerName = await getUserName(chatPartnerId);
+        String chatPartnerId =
+            members.firstWhere((memberId) => memberId != userId);
+        String chatPartnerName =
+            await userController.getUserName(chatPartnerId);
 
         chats.add({
           'chatId': chatDoc.id,
@@ -83,12 +65,10 @@ class ChatController{
     required String receiver,
     required String content,
   }) async {
-    FirebaseFirestore firestore = firestoreService.firestore;
-
     try {
       await firestore
           .collection('chats')
-          .doc(chatId)
+          .doc(chatId)// Kolla om chat finns med chatId// memb// skapa isåfall, annars meddelande.
           .collection('messages')
           .add({
         'sender': sender,
@@ -100,6 +80,17 @@ class ChatController{
       print("Error creating new message: $e");
     }
   }
+
+  void newChat(String memberOne, String memberTwo) async {
+    try {
+      await firestore.collection('chats').add({
+        'members': [memberOne, memberTwo]
+      }).then((DocumentReference docRef) {
+        docRef.collection('messages').doc().set({});
+      });
+    } catch (e) {
+      print("Error creating new chat: $e");
+    }
+  }
+
 }
-
-

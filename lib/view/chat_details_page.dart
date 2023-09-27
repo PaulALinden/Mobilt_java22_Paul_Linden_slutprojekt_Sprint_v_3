@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:sprint_v3/controller/chat_controller.dart';
+import 'package:sprint_v3/controller/user_controller.dart';
 
 import '../model/messages_model.dart';
 
@@ -7,6 +8,7 @@ class ChatDetailScreen extends StatelessWidget {
   final String chatId;
   final String userId;
   final String chatPartnerId;
+  final UserController userController = UserController();
   final ChatController chatController = ChatController();
   final TextEditingController messageController = TextEditingController();
 
@@ -40,7 +42,7 @@ class ChatDetailScreen extends StatelessWidget {
                     children: messages.map((message) {
                       return ListTile(
                         title: FutureBuilder<String>(
-                          future: chatController.getUserName(message.sender),
+                          future: userController.getUserName(message.sender),
                           builder: (context, snapshot) {
                             if (snapshot.connectionState == ConnectionState.waiting) {
                               return const Text('Loading...');
@@ -48,11 +50,11 @@ class ChatDetailScreen extends StatelessWidget {
                               return Text('Error: ${snapshot.error}');
                             } else {
                               String user = snapshot.data!;
-                              return Text('Sender: $user');
+                              return Text(user[0].toUpperCase() + user.substring(1).toLowerCase());
                             }
                           },
                         ),
-                        subtitle: Text('Content: ${message.content}'),
+                        subtitle: Text(message.content),
                       );
                     }).toList(),
                   );

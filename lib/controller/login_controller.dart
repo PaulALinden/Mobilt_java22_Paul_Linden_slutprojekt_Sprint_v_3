@@ -1,14 +1,12 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:sprint_v3/model/user_model.dart';
-import '../data/firestor_singelton.dart';
 
 class LoginController {
   Future<bool> login(UserModel user) async {
     String username = user.username;
     String password = user.password;
 
-    FirestoreService firestoreService = FirestoreService();
-    FirebaseFirestore firestore = firestoreService.firestore;
+    FirebaseFirestore firestore = FirebaseFirestore.instance;
 
     try {
       // Get a reference to the collection

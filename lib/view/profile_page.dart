@@ -1,12 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:sprint_v3/model/user_model.dart';
 import 'package:sprint_v3/view/chat_details_page.dart';
+import 'package:sprint_v3/view/new_chat_page.dart';
 
 import '../controller/chat_controller.dart';
 
 class ProfilePage extends StatelessWidget {
   final UserModel userModel;
   final ChatController chatController = ChatController();
+  final TextEditingController searchController = TextEditingController();
 
   ProfilePage({required this.userModel, Key? key}) : super(key: key);
 
@@ -62,7 +64,10 @@ class ProfilePage extends StatelessWidget {
             const SizedBox(height: 20),
             ElevatedButton(
               onPressed: () {
-                // Add logic to create new message
+                Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => NewChatPage(userId: userModel.userId)),
+                );
               },
               child: const Text('Create New Message'),
             ),
