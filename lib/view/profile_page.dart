@@ -18,13 +18,20 @@ class ProfilePage extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Profile Page'),
+        backgroundColor: Colors.blue[100],
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: <Widget>[
-            Text(userName[0].toUpperCase()+userName.substring(1).toLowerCase()),
+            Text(
+              userName[0].toUpperCase() + userName.substring(1).toLowerCase(),
+              style: const TextStyle(
+                fontSize: 24,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
             const SizedBox(height: 20),
             Expanded(
               child: StreamBuilder<List<Map<String, String>>>(
@@ -42,14 +49,27 @@ class ProfilePage extends StatelessWidget {
                       itemBuilder: (context, index) {
                         String chatPartnerId = chats[index]['chatPartnerId']!;
                         String chatPartnerName = chats[index]['chatPartnerName']!;
-                        return ListTile(
-                          title: Text('Chatting with: ${chatPartnerName[0].toUpperCase()}${chatPartnerName.substring(1).toLowerCase()}'),
-                          onTap: () {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(builder: (context) => ChatDetailScreen(userId: userModel.userId, chatPartnerId: chatPartnerId)),
-                            );
-                          },
+                        return Container(
+                          margin: const EdgeInsets.symmetric(vertical: 8.0),
+                          padding: const EdgeInsets.all(12.0),
+                          decoration: BoxDecoration(
+                            color: Colors.blue,
+                            borderRadius: BorderRadius.circular(10.0),
+                          ),
+                          child: ListTile(
+                            title: Text(
+                              '${chatPartnerName[0].toUpperCase()}${chatPartnerName.substring(1).toLowerCase()}',
+                              style: const TextStyle(color: Colors.white),
+                            ),
+                            onTap: () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => ChatDetailScreen(userId: userModel.userId, chatPartnerId: chatPartnerId),
+                                ),
+                              );
+                            },
+                          ),
                         );
                       },
                     );
