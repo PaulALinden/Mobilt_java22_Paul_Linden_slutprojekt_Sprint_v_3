@@ -55,10 +55,9 @@ class NewChatPageState extends State<NewChatPage> {
             child: Center(
               child: GestureDetector(
                 onTap: () {
-                  String tempChatId = 'New chat';
                   Navigator.push(
                     context,
-                    MaterialPageRoute(builder: (context) => ChatDetailScreen(chatId: tempChatId, userId: userId, chatPartnerId: resultId)),
+                    MaterialPageRoute(builder: (context) => ChatDetailScreen(userId: userId, chatPartnerId: resultId)),
                   );
                 },
                 child: Text(resultName),

@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:sprint_v3/model/user_model.dart';
 import 'package:sprint_v3/view/chat_details_page.dart';
-import 'package:sprint_v3/view/new_chat_page.dart';
-
+import 'package:sprint_v3/view/find_user_page.dart';
 import '../controller/chat_controller.dart';
 
 class ProfilePage extends StatelessWidget {
@@ -25,33 +24,30 @@ class ProfilePage extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: <Widget>[
-            Text(userName),
+            Text(userName[0].toUpperCase()+userName.substring(1).toLowerCase()),
             const SizedBox(height: 20),
-            Container(
-              height: 150, // Adjust the height as needed
-              color: Colors.grey[300], // Placeholder for messages
-              child: FutureBuilder<List<Map<String, String>>>(
-                future: chatController.getChatsForUser(userModel.userId),
+            Expanded(
+              child: StreamBuilder<List<Map<String, String>>>(
+                stream: chatController.getChatsForUserStream(userModel.userId),
                 builder: (context, snapshot) {
                   if (snapshot.connectionState == ConnectionState.waiting) {
-                    return const CircularProgressIndicator(); // Placeholder for loading state
+                    return const Center(child: CircularProgressIndicator());
                   } else if (snapshot.hasError) {
-                    return Text('Error: ${snapshot.error}');
+                    return Center(child: Text('Error: ${snapshot.error}'));
                   } else {
                     List<Map<String, String>> chats = snapshot.data!;
 
                     return ListView.builder(
                       itemCount: chats.length,
                       itemBuilder: (context, index) {
-                        String chatId= chats[index]['chatId']!;
                         String chatPartnerId = chats[index]['chatPartnerId']!;
                         String chatPartnerName = chats[index]['chatPartnerName']!;
                         return ListTile(
-                          title: Text('Chatting with: $chatPartnerName'),
+                          title: Text('Chatting with: ${chatPartnerName[0].toUpperCase()}${chatPartnerName.substring(1).toLowerCase()}'),
                           onTap: () {
                             Navigator.push(
                               context,
-                              MaterialPageRoute(builder: (context) => ChatDetailScreen(chatId: chatId, userId: userModel.userId, chatPartnerId: chatPartnerId)),
+                              MaterialPageRoute(builder: (context) => ChatDetailScreen(userId: userModel.userId, chatPartnerId: chatPartnerId)),
                             );
                           },
                         );
@@ -65,8 +61,8 @@ class ProfilePage extends StatelessWidget {
             ElevatedButton(
               onPressed: () {
                 Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (context) => NewChatPage(userId: userModel.userId)),
+                  context,
+                  MaterialPageRoute(builder: (context) => NewChatPage(userId: userModel.userId)),
                 );
               },
               child: const Text('Create New Message'),
@@ -77,5 +73,6 @@ class ProfilePage extends StatelessWidget {
     );
   }
 }
+
 
 
