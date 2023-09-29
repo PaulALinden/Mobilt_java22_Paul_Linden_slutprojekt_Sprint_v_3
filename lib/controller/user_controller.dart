@@ -25,7 +25,6 @@ class UserController {
     }
   }
 
-
   Future<String> getUserName(String userId) async {
     try {
       DocumentSnapshot userDoc =
@@ -39,6 +38,21 @@ class UserController {
     } catch (e) {
       print("Error getting user name: $e");
       return 'Unknown User';
+    }
+  }
+
+  Future<void> createNewUser({required String name, required String password}) async {
+    try {
+
+        await firestore
+            .collection('users')
+            .add({
+          'name': name,
+          'password': password,
+        });
+
+    } catch (e) {
+      print("Error creating new message: $e");
     }
   }
 }

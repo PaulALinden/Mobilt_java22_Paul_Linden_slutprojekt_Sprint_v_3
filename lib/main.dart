@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:sprint_v3/model/user_model.dart';
 import 'package:sprint_v3/view/profile_page.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:sprint_v3/view/registration_page.dart';
 import 'data/firebase_options.dart';
 import 'controller/login_controller.dart';
 
@@ -99,7 +100,6 @@ class _HomePageState extends State<HomePage> {
     });
   }
 
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -108,29 +108,41 @@ class _HomePageState extends State<HomePage> {
         title: Text(widget.title),
       ),
       body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            TextField(
-              controller: usernameController,
-              decoration: const InputDecoration(
-                labelText: 'Username',
+        child: SingleChildScrollView(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: <Widget>[
+              TextField(
+                controller: usernameController,
+                decoration: const InputDecoration(
+                  labelText: 'Username',
+                ),
               ),
-            ),
-            const SizedBox(height: 20),
-            TextField(
-              controller: passwordController,
-              obscureText: true, // For password fields
-              decoration: const InputDecoration(
-                labelText: 'Password',
+              const SizedBox(height: 20),
+              TextField(
+                controller: passwordController,
+                obscureText: true, // For password fields
+                decoration: const InputDecoration(
+                  labelText: 'Password',
+                ),
               ),
-            ),
-            const SizedBox(height: 20),
-            ElevatedButton(
-              onPressed: _login,
-              child: const Text('Login'),
-            ),
-          ],
+              const SizedBox(height: 20),
+              ElevatedButton(
+                onPressed: _login,
+                child: const Text('Login'),
+              ),
+              const SizedBox(height: 10),
+              TextButton(
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => const RegistrationPage()),
+                  );
+                },
+                child: const Text('Register'),
+              ),
+            ],
+          ),
         ),
       ),
     );

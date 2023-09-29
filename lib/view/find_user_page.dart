@@ -24,6 +24,7 @@ class NewChatPageState extends State<NewChatPage> {
   void _performSearch(String name) async {
     List<String>? resultList = await userController.searchUser(name);
 
+    //Printa lista istället så man kan hämta flera användare med samma namn
     setState(() {
       resultName = (resultList?[1] ?? '');
       resultId = (resultList?[0] ?? '');
@@ -37,10 +38,10 @@ class NewChatPageState extends State<NewChatPage> {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Search Field Example'),
+        title: const Text('Search'),
       ),
       body: Column(
-        children: [
+        children:[
           Padding(
             padding: const EdgeInsets.all(8.0),
             child: TextField(

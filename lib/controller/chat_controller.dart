@@ -40,7 +40,6 @@ class ChatController {
     });
   }
 
-
   Stream<List<Map<String, String>>> getChatsForUserStream(String userId) {
     return firestore
         .collection('chats')
@@ -109,9 +108,7 @@ class ChatController {
         .get();
 
     List<String> chatIds1 = querySnapshot1.docs.map((doc) => doc.id).toList();
-
     List<String> chatIds2 = querySnapshot2.docs.map((doc) => doc.id).toList();
-
 
     List<String> commonChatIds =
         chatIds1.toSet().intersection(chatIds2.toSet()).toList();
