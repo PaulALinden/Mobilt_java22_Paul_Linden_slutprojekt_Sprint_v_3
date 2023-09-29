@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:sprint_v3/controller/chat_controller.dart';
 import 'package:sprint_v3/controller/user_controller.dart';
-import 'package:sprint_v3/view/chat_details_page.dart';
+import 'package:sprint_v3/view/chat_page.dart';
 
 class NewChatPage extends StatefulWidget {
 
@@ -31,6 +31,7 @@ class NewChatPageState extends State<NewChatPage> {
   }
 
   @override
+  @override
   Widget build(BuildContext context) {
     String userId = widget.userId;
 
@@ -51,22 +52,42 @@ class NewChatPageState extends State<NewChatPage> {
               ),
             ),
           ),
-          Expanded(
-            child: Center(
+          if (resultName.isNotEmpty)
+            Center(
               child: GestureDetector(
                 onTap: () {
                   Navigator.push(
                     context,
-                    MaterialPageRoute(builder: (context) => ChatDetailScreen(userId: userId, chatPartnerId: resultId)),
+                    MaterialPageRoute(
+                      builder: (context) => ChatDetailScreen(userId: userId, chatPartnerId: resultId),
+                    ),
                   );
                 },
-                child: Text(resultName),
+                child: SizedBox(
+                  height: 70.0,
+                  child: FractionallySizedBox(
+                    widthFactor: 0.8,
+                    child: Container(
+                      margin: const EdgeInsets.only(top: 16.0),
+                      padding: const EdgeInsets.all(8.0),
+                      decoration: BoxDecoration(
+                        color: Colors.blue,
+                        borderRadius: BorderRadius.circular(10.0),
+                      ),
+                      child: Text(
+                        resultName[0].toUpperCase()+resultName.substring(1).toLowerCase(),
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontSize: 26,
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
               ),
             ),
-          ),
         ],
       ),
     );
   }
 }
-

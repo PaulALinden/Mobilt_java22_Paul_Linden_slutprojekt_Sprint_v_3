@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:sprint_v3/model/user_model.dart';
-import 'package:sprint_v3/view/chat_details_page.dart';
+import 'package:sprint_v3/view/chat_page.dart';
 import 'package:sprint_v3/view/find_user_page.dart';
 import '../controller/chat_controller.dart';
 
@@ -17,7 +17,7 @@ class ProfilePage extends StatelessWidget {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Profile Page'),
+        title: const Text('Profile'),
         backgroundColor: Colors.blue[100],
       ),
       body: Padding(
