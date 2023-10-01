@@ -2,7 +2,7 @@
     <application
         android:label="sprint_v3"
         android:name="${applicationName}"
-        android:icon="@mipmap/ic_launcher">
+        android:icon="@mipmap/chat">
         <activity
             android:name=".MainActivity"
             android:exported="true"
