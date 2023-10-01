@@ -4,15 +4,15 @@ import 'package:sprint_v3/model/chats_model.dart';
 import 'package:sprint_v3/model/user_model.dart';
 import 'package:sprint_v3/view/chat_page.dart';
 
-class NewChatPage extends StatefulWidget {
+class FindUserPage extends StatefulWidget {
   final UserModel userModel;
-  const NewChatPage({required this.userModel, Key? key}) : super(key: key);
+  const FindUserPage({required this.userModel, Key? key}) : super(key: key);
 
   @override
-  NewChatPageState createState() => NewChatPageState();
+  FindUserPageState createState() => FindUserPageState();
 }
 
-class NewChatPageState extends State<NewChatPage> {
+class FindUserPageState extends State<FindUserPage> {
   // Controller for handling user input
   final TextEditingController _searchController = TextEditingController();
   final UserController _userController = UserController();
@@ -73,8 +73,7 @@ class NewChatPageState extends State<NewChatPage> {
                       Navigator.push(
                         context,
                         MaterialPageRoute(
-                          builder: (context) =>
-                              ChatDetailScreen(chatModel: chatModel),
+                          builder: (context) => ChatPage(chatModel: chatModel),
                         ),
                       );
                     },

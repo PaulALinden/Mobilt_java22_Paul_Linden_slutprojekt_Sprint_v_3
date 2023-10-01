@@ -93,7 +93,7 @@ class ProfilePage extends StatelessWidget {
                                     Navigator.push(
                                       context,
                                       MaterialPageRoute(
-                                        builder: (context) => ChatDetailScreen(
+                                        builder: (context) => ChatPage(
                                             chatModel: chats[index]),
                                       ),
                                     );
@@ -116,7 +116,7 @@ class ProfilePage extends StatelessWidget {
                 Navigator.push(
                   context,
                   MaterialPageRoute(
-                      builder: (context) => NewChatPage(userModel: userModel)),
+                      builder: (context) => FindUserPage(userModel: userModel)),
                 );
               },
               child: const Text('Create New Message'),

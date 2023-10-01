@@ -33,13 +33,11 @@ class ChatController {
               timestamp: data['timestamp'],
             ));
           }
-          print('messages');
           return messages;
         });
       } else {
         // Chat ID not found, retry after a delay
-        print('Chat not found. Retrying...');
-        await Future.delayed(const Duration(seconds: 1));
+        await Future.delayed(const Duration(seconds: 2));
         yield* getMessagesForChatStream(chatModel);
       }
     });

@@ -19,13 +19,14 @@ class RegistrationPageState extends State<RegistrationPage> {
     super.initState();
     _nameController = TextEditingController();
     _passwordController = TextEditingController();
+    _userController = UserController();
   }
 
   void _register() async {
     // Retrieve the entered username and password
     String username = _nameController.text.toLowerCase();
     String password = _passwordController.text.toLowerCase();
-
+print(username);
     // Create a new user
     _userController.createNewUser(name: username, password: password);
     // Pop the current page to go back to the previous screen

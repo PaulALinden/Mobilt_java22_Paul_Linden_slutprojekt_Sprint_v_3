@@ -5,7 +5,7 @@ import 'package:sprint_v3/controller/user_controller.dart';
 import '../model/chats_model.dart';
 import '../model/messages_model.dart';
 
-class ChatDetailScreen extends StatelessWidget {
+class ChatPage extends StatelessWidget {
   // ChatsModel instance passed from the previous screen
   final ChatsModel chatModel;
 
@@ -16,7 +16,7 @@ class ChatDetailScreen extends StatelessWidget {
   final TextEditingController _messageController =
       TextEditingController(); // Controller for message input
 
-  ChatDetailScreen({
+  ChatPage({
     Key? key,
     required this.chatModel,
   }) : super(key: key);
@@ -38,7 +38,7 @@ class ChatDetailScreen extends StatelessWidget {
               builder: (context, snapshot) {
                 if (snapshot.connectionState == ConnectionState.waiting) {
                   // Displaying loading indicator
-                  return const Center(child: CircularProgressIndicator());
+                  return const Center(child: Text('Write message'));
                 } else if (snapshot.hasError) {
                   // Displaying error if data retrieval fails
                   return Center(child: Text('Error: ${snapshot.error}'));
