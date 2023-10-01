@@ -1,11 +1,12 @@
+import 'package:firebase_core/firebase_core.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:sprint_v3/model/user_model.dart';
 import 'package:sprint_v3/view/profile_page.dart';
-import 'package:firebase_core/firebase_core.dart';
 import 'package:sprint_v3/view/registration_page.dart';
-import 'data/firebase_options.dart';
-import 'controller/login_controller.dart';
 
+import 'controller/login_controller.dart';
+import 'data/firebase_options.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -15,12 +16,9 @@ void main() async {
   runApp(const MyApp());
 }
 
-
-
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
 
-  // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -36,6 +34,7 @@ class MyApp extends StatelessWidget {
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key, required this.title});
+
   final String title;
 
   @override
@@ -43,46 +42,49 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-  late TextEditingController usernameController;
-  late TextEditingController passwordController;
+  late final TextEditingController _usernameController;
+  late final TextEditingController _passwordController;
+  final LoginController _loginController = LoginController();
 
   @override
   void initState() {
     super.initState();
-    usernameController = TextEditingController();
-    passwordController = TextEditingController();
+    // Initializing text controllers
+    _usernameController = TextEditingController();
+    _passwordController = TextEditingController();
   }
 
   @override
   void dispose() {
-    usernameController.dispose();
-    passwordController.dispose();
+    // Disposing text controllers to prevent memory leaks
+    _usernameController.dispose();
+    _passwordController.dispose();
     super.dispose();
   }
 
   void _login() {
-    String username = usernameController.text.toLowerCase();
-    String password = passwordController.text.toLowerCase();
+    // Retrieving the entered username and password
+    String username = _usernameController.text.toLowerCase();
+    String password = _passwordController.text.toLowerCase();
 
-    UserModel userModel = UserModel();
-    userModel.username = username;
-    userModel.password = password;
-
-    LoginController loginController = LoginController();
-
-    loginController.login(userModel).then((bool isUser) {
-      if (isUser) {
+    // Calling the login function and handling the result
+    _loginController.login(username, password).then((UserModel? userModel) {
+      if (userModel != null) {
+        // Navigating to the Profile Page if login is successful
         Navigator.push(
           context,
-          MaterialPageRoute(builder: (context) => ProfilePage(userModel: userModel)),
+          MaterialPageRoute(
+              builder: (context) => ProfilePage(userModel: userModel)),
         );
       } else {
+        // Displaying an error dialog if login fails
         showDialog(
           context: context,
           builder: (BuildContext context) {
             return AlertDialog(
               title: const Text('Login Failed'),
-              content: const Text('Invalid username or password. Please try again.'),
+              content:
+                  const Text('Invalid username or password. Please try again.'),
               actions: [
                 TextButton(
                   onPressed: () {
@@ -96,7 +98,9 @@ class _HomePageState extends State<HomePage> {
         );
       }
     }).catchError((error) {
-      print('Error: $error'); // Handle the error here
+      if (kDebugMode) {
+        print('Error: $error');
+      }
     });
   }
 
@@ -113,15 +117,16 @@ class _HomePageState extends State<HomePage> {
             mainAxisAlignment: MainAxisAlignment.center,
             children: <Widget>[
               TextField(
-                controller: usernameController,
+                controller: _usernameController,
                 decoration: const InputDecoration(
                   labelText: 'Username',
                 ),
               ),
               const SizedBox(height: 20),
               TextField(
-                controller: passwordController,
-                obscureText: true, // For password fields
+                controller: _passwordController,
+                obscureText: true,
+                // For password fields
                 decoration: const InputDecoration(
                   labelText: 'Password',
                 ),
@@ -136,7 +141,8 @@ class _HomePageState extends State<HomePage> {
                 onPressed: () {
                   Navigator.push(
                     context,
-                    MaterialPageRoute(builder: (context) => const RegistrationPage()),
+                    MaterialPageRoute(
+                        builder: (context) => const RegistrationPage()),
                   );
                 },
                 child: const Text('Register'),
@@ -148,4 +154,3 @@ class _HomePageState extends State<HomePage> {
     );
   }
 }
-

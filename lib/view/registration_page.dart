@@ -9,17 +9,35 @@ class RegistrationPage extends StatefulWidget {
 }
 
 class RegistrationPageState extends State<RegistrationPage> {
-  final TextEditingController _nameController = TextEditingController();
-  final TextEditingController _passwordController = TextEditingController();
-  final UserController userController = UserController();
+  late final TextEditingController _nameController;
+  late final TextEditingController _passwordController;
+  late final UserController _userController;
+
+  @override
+  void initState() {
+    // Initializing text controllers
+    super.initState();
+    _nameController = TextEditingController();
+    _passwordController = TextEditingController();
+  }
 
   void _register() async {
+    // Retrieve the entered username and password
     String username = _nameController.text.toLowerCase();
     String password = _passwordController.text.toLowerCase();
 
-    userController.createNewUser(name: username, password: password);
-
+    // Create a new user
+    _userController.createNewUser(name: username, password: password);
+    // Pop the current page to go back to the previous screen
     Navigator.pop(context);
+  }
+
+  @override
+  void dispose() {
+    // Disposing text controllers to prevent memory leaks
+    _nameController.dispose();
+    _passwordController.dispose();
+    super.dispose();
   }
 
   @override

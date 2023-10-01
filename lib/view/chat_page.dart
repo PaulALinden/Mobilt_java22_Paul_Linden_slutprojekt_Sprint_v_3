@@ -1,24 +1,31 @@
 import 'package:flutter/material.dart';
 import 'package:sprint_v3/controller/chat_controller.dart';
 import 'package:sprint_v3/controller/user_controller.dart';
+
+import '../model/chats_model.dart';
 import '../model/messages_model.dart';
 
 class ChatDetailScreen extends StatelessWidget {
-  final String userId;
-  final String chatPartnerId;
+  // ChatsModel instance passed from the previous screen
+  final ChatsModel chatModel;
 
-  final UserController userController = UserController();
-  final ChatController chatController = ChatController();
-  final TextEditingController messageController = TextEditingController();
+  final UserController _userController =
+      UserController(); // Controller for user-related operations
+  final ChatController _chatController =
+      ChatController(); // Controller for chat-related operations
+  final TextEditingController _messageController =
+      TextEditingController(); // Controller for message input
 
   ChatDetailScreen({
     Key? key,
-    required this.userId,
-    required this.chatPartnerId,
+    required this.chatModel,
   }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
+    String userId =
+        chatModel.members.first; // Extracting user ID from chatModel
+
     return Scaffold(
       appBar: AppBar(
         title: const Text('Chat'),
@@ -27,13 +34,16 @@ class ChatDetailScreen extends StatelessWidget {
         children: [
           Expanded(
             child: StreamBuilder<List<MessagesModel>>(
-              stream: chatController.getMessagesForChatStream(userId, chatPartnerId),
+              stream: _chatController.getMessagesForChatStream(chatModel),
               builder: (context, snapshot) {
                 if (snapshot.connectionState == ConnectionState.waiting) {
-                  return const Text('');
+                  // Displaying loading indicator
+                  return const Center(child: CircularProgressIndicator());
                 } else if (snapshot.hasError) {
+                  // Displaying error if data retrieval fails
                   return Center(child: Text('Error: ${snapshot.error}'));
                 } else {
+                  // Extracting list of messages
                   List<MessagesModel> messages = snapshot.data!;
                   return ListView(
                     children: messages.map((message) {
@@ -42,29 +52,39 @@ class ChatDetailScreen extends StatelessWidget {
                       return Padding(
                         padding: const EdgeInsets.all(8.0),
                         child: Row(
-                          mainAxisAlignment: isUserMessage ? MainAxisAlignment.end : MainAxisAlignment.start,
+                          mainAxisAlignment: isUserMessage
+                              ? MainAxisAlignment.end
+                              : MainAxisAlignment.start,
                           children: [
                             Container(
                               padding: const EdgeInsets.all(8.0),
                               decoration: BoxDecoration(
-                                color: isUserMessage ? Colors.green : Colors.blue,
+                                color:
+                                    isUserMessage ? Colors.green : Colors.blue,
                                 borderRadius: BorderRadius.circular(8.0),
                               ),
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
                                   FutureBuilder<String>(
-                                    future: userController.getUserName(message.sender),
+                                    future: _userController
+                                        .getUserName(message.sender),
                                     builder: (context, snapshot) {
-                                      if (snapshot.connectionState == ConnectionState.waiting) {
+                                      if (snapshot.connectionState ==
+                                          ConnectionState.waiting) {
+                                        // Displaying loading text while waiting for user name
                                         return const Text('Loading...');
                                       } else if (snapshot.hasError) {
+                                        // Displaying error if user name retrieval fails
                                         return Text('Error: ${snapshot.error}');
                                       } else {
+                                        // Extracting user name
                                         String user = snapshot.data!;
                                         return Text(
-                                          user[0].toUpperCase() + user.substring(1).toLowerCase(),
-                                          style: const TextStyle(color: Colors.white),
+                                          user[0].toUpperCase() +
+                                              user.substring(1).toLowerCase(),
+                                          style: const TextStyle(
+                                              color: Colors.white),
                                         );
                                       }
                                     },
@@ -92,7 +112,7 @@ class ChatDetailScreen extends StatelessWidget {
               children: [
                 Expanded(
                   child: TextField(
-                    controller: messageController,
+                    controller: _messageController,
                     decoration: const InputDecoration(
                       hintText: 'Type a message...',
                     ),
@@ -101,13 +121,12 @@ class ChatDetailScreen extends StatelessWidget {
                 IconButton(
                   icon: const Icon(Icons.send),
                   onPressed: () {
-                    String message = messageController.text;
-                    chatController.createNewMessage(
-                      sender: userId,
-                      receiver: chatPartnerId,
+                    String message = _messageController.text;
+                    _chatController.createNewMessage(
+                      chatModel: chatModel,
                       content: message,
                     );
-                    messageController.clear();
+                    _messageController.clear();
                   },
                 ),
               ],
@@ -118,5 +137,3 @@ class ChatDetailScreen extends StatelessWidget {
     );
   }
 }
-
-

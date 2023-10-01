@@ -1,13 +1,10 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter/foundation.dart';
 import 'package:sprint_v3/model/user_model.dart';
 
 class LoginController {
-  Future<bool> login(UserModel user) async {
-    String username = user.username;
-    String password = user.password;
-
+  Future<UserModel?> login(String username, String password) async {
     FirebaseFirestore firestore = FirebaseFirestore.instance;
-
     try {
       // Get a reference to the collection
       CollectionReference users = firestore.collection('users');
@@ -16,21 +13,20 @@ class LoginController {
       // Loop through and check users
       for (QueryDocumentSnapshot doc in querySnapshot.docs) {
         Map<String, dynamic> data = doc.data() as Map<String, dynamic>;
-        String dbname = data['name'];
-        String dbpassword = data['password'];
-        String dbUserId = doc.id;
+        String dbName = data['name'];
+        String dbPassword = data['password'];
+        String dbId = doc.id;
 
-        if(dbname == username && dbpassword == password){
-          user.userId = dbUserId;
-          return true;
+        if (dbName == username && dbPassword == password) {
+          UserModel userModel = UserModel(dbId, dbName, dbPassword);
+          return userModel;
         }
       }
     } catch (e) {
-      print("Error getting data: $e");
+      if (kDebugMode) {
+        print("Error getting data: $e");
+      }
     }
-    return false;
+    return null;
   }
 }
-
-
-

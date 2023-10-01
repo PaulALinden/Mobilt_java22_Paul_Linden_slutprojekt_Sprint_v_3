@@ -1,16 +1,19 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:sprint_v3/controller/user_controller.dart';
 import 'package:sprint_v3/model/messages_model.dart';
 
-class ChatController {
-  final FirebaseFirestore firestore = FirebaseFirestore.instance;
-  final UserController userController = UserController();
+import '../model/chats_model.dart';
 
-  Stream<List<MessagesModel>> getMessagesForChatStream(String userId1, String userId2) {
-    return Stream.fromFuture(findChatId(userId1, userId2))
+class ChatController {
+  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+
+  // Retrieves a stream of messages for a given chat model
+  Stream<List<MessagesModel>> getMessagesForChatStream(chatModel) {
+    return Stream.fromFuture(
+            findChatId(chatModel.members[0], chatModel.members[1]))
         .asyncExpand((chatId) async* {
       if (chatId != null) {
-        yield* firestore
+        // Chat ID found, yield a stream of messages for this chat
+        yield* _firestore
             .collection('chats')
             .doc(chatId)
             .collection('messages')
@@ -19,6 +22,7 @@ class ChatController {
             .map((QuerySnapshot query) {
           List<MessagesModel> messages = [];
 
+          // Iterate through each message document in the query result
           for (var doc in query.docs) {
             Map<String, dynamic> data = doc.data() as Map<String, dynamic>;
             messages.add(MessagesModel(
@@ -33,76 +37,84 @@ class ChatController {
           return messages;
         });
       } else {
+        // Chat ID not found, retry after a delay
         print('Chat not found. Retrying...');
         await Future.delayed(const Duration(seconds: 1));
-        yield* getMessagesForChatStream(userId1, userId2);
+        yield* getMessagesForChatStream(chatModel);
       }
     });
   }
 
-  Stream<List<Map<String, String>>> getChatsForUserStream(String userId) {
-    return firestore
+  // Retrieves a stream of chats for a given user ID
+  Stream<List<ChatsModel>> getChatsForUserStream(String userId) {
+    return _firestore
         .collection('chats')
         .where('members', arrayContains: userId)
         .snapshots()
         .asyncMap((QuerySnapshot chatSnapshot) async {
-      List<Map<String, String>> chats = [];
+      List<ChatsModel> chats = [];
 
       for (QueryDocumentSnapshot chatDoc in chatSnapshot.docs) {
         List<String> members = List<String>.from(chatDoc['members']);
         String chatPartnerId =
-        members.firstWhere((memberId) => memberId != userId);
-        String chatPartnerName = await userController.getUserName(chatPartnerId);
+            members.firstWhere((memberId) => memberId != userId);
 
-        chats.add({
-          'chatId': chatDoc.id,
-          'chatPartnerId': chatPartnerId,
-          'chatPartnerName': chatPartnerName,
-        });
+        ChatsModel chatModel = ChatsModel();
+        chatModel.chatId = chatDoc.id;
+        chatModel.members = [userId, chatPartnerId];
+        chatModel.messages = [];
+
+        chats.add(chatModel);
       }
-
       return chats;
     });
   }
 
-  Future<void> createNewMessage({required String sender, required String receiver, required String content,}) async {
-    try {
-      String? chatId = await findChatId(sender, receiver);
+  // Creates a new message and adds it to an existing chat or creates a new chat if it doesn't exist
+  Future<ChatsModel> createNewMessage(
+      {required String content, required ChatsModel chatModel}) async {
+    // Check if chatId exists
+    var chatDoc =
+        await _firestore.collection('chats').doc(chatModel.chatId).get();
 
-      if (chatId != null) {
-        await firestore
-            .collection('chats')
-            .doc(chatId)
-            .collection('messages')
-            .add({
-          'sender': sender,
-          'receiver': receiver,
-          'content': content,
-          'timestamp': DateTime.timestamp(),
-        });
-      } else {
-        DocumentReference chatRef = await firestore.collection('chats').add({
-          'members': [sender, receiver],
-        });
-        await chatRef.collection('messages').add({
-          'sender': sender,
-          'receiver': receiver,
-          'content': content,
-          'timestamp': DateTime.timestamp(),
-        });
-      }
-    } catch (e) {
-      print("Error creating new message: $e");
+    if (chatDoc.exists) {
+      // Chat exists, add message to existing chat
+      _firestore
+          .collection('chats')
+          .doc(chatModel.chatId)
+          .collection('messages')
+          .add({
+        'sender': chatModel.members[0],
+        'receiver': chatModel.members[1],
+        'content': content,
+        'timestamp': Timestamp.now(),
+      });
+    } else {
+      // Chat doesn't exist, create new chat and add message
+      DocumentReference chatRef = await _firestore.collection('chats').add({
+        'members': [chatModel.members[0], chatModel.members[1]],
+      });
+      // Set chat id
+      chatModel.chatId = chatRef.id;
+
+      await chatRef.collection('messages').add({
+        'sender': chatModel.members[0],
+        'receiver': chatModel.members[1],
+        'content': content,
+        'timestamp': Timestamp.now(),
+      });
     }
+    return chatModel;
   }
 
+  // Finds the chat ID for two given user IDs
   Future<String?> findChatId(String userId1, String userId2) async {
-    QuerySnapshot querySnapshot1 = await firestore
+    QuerySnapshot querySnapshot1 = await _firestore
         .collection('chats')
         .where('members', arrayContains: userId1)
         .get();
 
-    QuerySnapshot querySnapshot2 = await firestore
+    QuerySnapshot querySnapshot2 = await _firestore
         .collection('chats')
         .where('members', arrayContains: userId2)
         .get();
@@ -120,5 +132,4 @@ class ChatController {
       return null;
     }
   }
-
 }

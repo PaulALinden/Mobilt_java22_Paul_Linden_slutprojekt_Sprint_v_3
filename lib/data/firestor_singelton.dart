@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 
+// Firestore singleton
 class FirestoreService {
   static final FirestoreService _singleton = FirestoreService._internal();
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
